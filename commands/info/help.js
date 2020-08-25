@@ -29,15 +29,16 @@ module.exports = {
                     const capitalise = category.slice(0, 1).toUpperCase() + category.slice(1)
                     try {
                         embed.addField(` ${capitalise} [${dir.size}] - `, dir.map(c => `\`${c.config.name}\``).join(", "))
-                    } catch (e) {
-                        console.log(e)
-                    }
+                    } catch (error) {
+                        console.error(error);
+                        return message.channel.send(`An Error Occurred: \`${error.message}\`!`);
+                    };
                 });
 
                 return message.channel.send(embed)
             } else {
                 let command = bot.commands.get(bot.aliases.get(args[0].toLowerCase()) || args[0].toLowerCase())
-                if (!command) return message.channel.send(embed.setTitle("**Invalid Command!**").setDescription(`**Do \`${prefix}help\` For the List Of the Commands!**`))
+                if (!command) return message.channel.send(embed.setTitle("**Invalid Command!**").setDescription(`**Do \`${PREFIX}help\` For the List Of the Commands!**`))
                 command = command.config
 
                 embed.setDescription(`**The Bot's Prefix Is \`${PREFIX}\`**\n
