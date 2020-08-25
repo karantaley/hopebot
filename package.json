@@ -1,6 +1,6 @@
 {
   "name": "hope_bot",
-  "version": "2.0.1",
+  "version": "2.2.1",
   "description": "Official HOPE BOT",
   "main": "index.js",
   "dependencies": {
