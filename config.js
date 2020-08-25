@@ -1,5 +1,5 @@
-exports.PREFIX = '';
+exports.PREFIX = ''; //Example - !
 
-exports.TOKEN = '';
+exports.TOKEN = ''; //discord.com/developers/applications
 
-exports.GOOGLE_API_KEY = '';
+exports.GOOGLE_API_KEY = ''; //https://console.developers.google.com
