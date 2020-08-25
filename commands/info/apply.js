@@ -46,7 +46,6 @@ module.exports = {
                 await Applicants.deleteOne({
                     ApplicantID: message.author.id
                 });
-                console.log(applicant);
                 return message.channel.send('Cannot Continue Application! Your DMs Are Blocked!');
             };
             const filter = m => m.author.id === message.author.id && m.author.id !== bot.user.id;
