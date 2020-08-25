@@ -1,6 +1,6 @@
 module.exports = {
     config: {
-        name: 'clear',
+        name: 'clearqueue',
         aliases: ['clearall'],
         category: "music",
         description: 'Skips all songs in queue',
