@@ -1,21 +1,30 @@
 {
-  "name": "hope-bot",
-  "version": "1.0.0",
-  "description": "+help",
+  "name": "hope_bot",
+  "version": "2.0.1",
+  "description": "Official HOPE BOT",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "KT-man",
-  "license": "ISC",
   "dependencies": {
     "@discordjs/collection": "^0.1.6",
     "@discordjs/opus": "^0.3.2",
-    "cheerio": "^1.0.0-rc.3",
-    "discord.js": "^12.2.0",
-    "ffmpeg-static": "^4.2.6",
-    "node-fetch": "^2.6.0",
+    "canvas": "^2.6.1",
+    "discord.js": "^12.3.1",
+    "mongoose": "^5.10.0",
     "simple-youtube-api": "^5.2.1",
     "ytdl-core": "^3.2.0"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Firez",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karantaley/hopebot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/karantaley/hopebot/issues"
+  },
+  "homepage": "https://github.com/karantaley/hopebot#readme"
 }
