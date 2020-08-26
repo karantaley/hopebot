@@ -49,6 +49,8 @@ bot.on('message', async (message) => {
             return message.channel.send(`Parsh ka net kharab hai bhai, VC nahi kar sakta`);
         } else if (message.content.toLowerCase() === 'noob') {
             return message.channel.send(`${message.member} Tu ultra pro max noob`);
+        } else if (message.content.toLowerCase().includes('inners')) {
+            return message.channel.send(`Inners Start At 9:30 p.m. Everyday!`)
         };
     } catch (error) {
         return console.error(error);
