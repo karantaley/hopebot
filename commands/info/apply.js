@@ -64,8 +64,9 @@ module.exports = {
             message.author.send({ embed: startEmbed });
             let currentStep = 0;
 
-            collector.on('collect', async () => {
+            collector.on('collect', async (collected) => {
                 try {
+                    if (collected.content.toLowerCase() === '+cancel') return message.author.send(`**Application Cancelled**!`);
                     if (currentStep === currentStep) currentStep = currentStep + 1;
                     if (currentStep === 1) {
                         const embed = new MessageEmbed()
