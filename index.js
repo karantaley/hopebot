@@ -1,9 +1,7 @@
 const { Client, Collection, MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const { TOKEN } = require('./config');
-const bot = new Client({
-    disableMentions: 'everyone',
-});
+const bot = new Client();
 
 bot.commands = new Collection();
 bot.aliases = new Collection();
