@@ -15,9 +15,8 @@ module.exports = {
     },
     run: async (bot, message, args, ops) => {
         if (!args[0]) return message.channel.send("**Please Enter Song Name Or Link!**")
-        args = message.content.split(' ');
-        const searchString = args.slice(1).join(' ');
-        const url = args[1] ? args[1].replace(/<(.+)>/g, '$1') : '';
+        const searchString = args.join(' ');
+        const url = args[0] ? args[0].replace(/<(.+)>/g, '$1') : '';
 
         const { channel } = message.member.voice;
         if (!channel) return message.channel.send('I\'m sorry but you need to be in a voice channel to play music!');
@@ -32,7 +31,7 @@ module.exports = {
 
             for (const video of Object.values(videos)) {
                 const video2 = await youtube.getVideoByID(video.id);
-                await handleVideo(video2, message, channel, true);
+                await handleVideo(video2, message, channel, ops, true);
             }
             return message.channel.send(`**Playlist \`${playlist.title}\` has been added to the queue!**`);
         } else {
@@ -47,91 +46,91 @@ module.exports = {
                     return message.channel.send('❌ **No matches**')
                 }
             }
-            return handleVideo(video, message, channel);
-
-            async function handleVideo(video, message, channel, playlist = false) {
-                const serverQueue = ops.queue.get(message.guild.id);
-                const songInfo = await ytdl.getInfo(video.id);
-                const song = {
-                    id: video.id,
-                    title: Util.escapeMarkdown(video.title),
-                    url: `https://www.youtube.com/watch?v=${video.id}`,
-                    thumbnail: `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`,
-                    duration: video.duration,
-                    time: songInfo.videoDetails.lengthSeconds
-                };
-
-                if (serverQueue) {
-                    serverQueue.songs.push(song);
-                    if (playlist) return undefined;
-                    else {
-                        const sembed = new MessageEmbed()
-                            .setColor("GREEN")
-                            .setTitle("Added To Queue")
-                            .setThumbnail(song.thumbnail)
-                            .setTimestamp()
-                            .setDescription(`**${song.title}** has been added to queue! | Requested By **${message.author.username}**`)
-                            .setFooter(message.member.displayName, message.author.displayAvatarURL());
-                        message.channel.send(sembed)
-                    }
-                    return undefined;
-                }
-
-                const queueConstruct = {
-                    textChannel: message.channel,
-                    voiceChannel: channel,
-                    connection: null,
-                    songs: [],
-                    volume: 2,
-                    playing: true,
-                    loop: false,
-                };
-                ops.queue.set(message.guild.id, queueConstruct);
-                queueConstruct.songs.push(song);
-                try {
-                    const connection = await channel.join();
-                    queueConstruct.connection = connection;
-                    play(queueConstruct.songs[0]);
-                } catch (error) {
-                    console.error(`I could not join the voice channel: ${error.message}`);
-                    ops.queue.delete(message.guild.id);
-                    await channel.leave();
-                    return message.channel.send(`I could not join the voice channel: ${error.message}`);
-                }
-            };
-            async function play(song) {
-                const queue = ops.queue.get(message.guild.id);
-                if (!song) {
-                    queue.voiceChannel.leave();
-                    ops.queue.delete(message.guild.id);
-                    return;
-                };
-
-                let npmin = Math.floor(song.time / 60);
-                let npsec = song.time - npmin * 60
-                let np = `${npmin}:${npsec}`.split(' ')
-
-                const dispatcher = queue.connection.play(ytdl(song.url, { highWaterMark: 1 << 25, quality: 'highestaudio', filter: 'audioonly' }))
-                    .on('finish', () => {
-                        if (queue.loop) {
-                            queue.songs.push(queue.songs.shift());
-                            return play(queue.songs[0]);
-                        }
-                        queue.songs.shift();
-                        play(queue.songs[0]);
-                    })
-                    .on('error', error => console.error(error.message));
-                dispatcher.setVolumeLogarithmic(queue.volume / 5);
-                const embed = new MessageEmbed()
-                    .setColor("GREEN")
-                    .setTitle('Now Playing\n')
-                    .setThumbnail(song.thumbnail)
-                    .setTimestamp()
-                    .setDescription(`🎵 Now playing:\n **${song.title}** 🎵\n\n Song Length: **${np}**`)
-                    .setFooter(message.member.displayName, message.author.displayAvatarURL());
-                queue.textChannel.send(embed);
-                return;
-            };
+            return handleVideo(video, message, channel, ops);
         };
     }
+};
+
+async function handleVideo(video, message, channel, ops, playlist = false) {
+    const serverQueue = ops.queue.get(message.guild.id);
+    const songInfo = await ytdl.getInfo(video.id);
+    const song = {
+        id: video.id,
+        title: Util.escapeMarkdown(video.title),
+        url: `https://www.youtube.com/watch?v=${video.id}`,
+        thumbnail: `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`,
+        duration: video.duration,
+        time: songInfo.videoDetails.lengthSeconds
+    };
+
+    if (serverQueue) {
+        serverQueue.songs.push(song);
+        if (playlist) return undefined;
+        else {
+            const sembed = new MessageEmbed()
+                .setColor("GREEN")
+                .setTitle("Added To Queue")
+                .setThumbnail(song.thumbnail)
+                .setTimestamp()
+                .setDescription(`**${song.title}** has been added to queue! | Requested By **${message.author.username}**`)
+                .setFooter(message.member.displayName, message.author.displayAvatarURL());
+            message.channel.send(sembed)
+        }
+        return undefined;
+    }
+
+    const queueConstruct = {
+        textChannel: message.channel,
+        voiceChannel: channel,
+        connection: null,
+        songs: [],
+        volume: 2,
+        playing: true,
+        loop: false,
+    };
+    ops.queue.set(message.guild.id, queueConstruct);
+    queueConstruct.songs.push(song);
+    try {
+        const connection = await channel.join();
+        queueConstruct.connection = connection;
+        play(queueConstruct.songs[0], ops, message);
+    } catch (error) {
+        console.error(`I could not join the voice channel: ${error.message}`);
+        ops.queue.delete(message.guild.id);
+        await channel.leave();
+        return message.channel.send(`I could not join the voice channel: ${error.message}`);
+    }
+};
+async function play(song, ops, message) {
+    const queue = ops.queue.get(message.guild.id);
+    if (!song) {
+        queue.voiceChannel.leave();
+        ops.queue.delete(message.guild.id);
+        return;
+    };
+
+    let npmin = Math.floor(song.time / 60);
+    let npsec = song.time - npmin * 60
+    let np = `${npmin}:${npsec}`.split(' ')
+
+    const dispatcher = queue.connection.play(ytdl(song.url, { highWaterMark: 1 << 25, quality: 'highestaudio', filter: 'audioonly' }))
+        .on('finish', () => {
+            if (queue.loop) {
+                queue.songs.push(queue.songs.shift());
+                return play(queue.songs[0]);
+            }
+            queue.songs.shift();
+            play(queue.songs[0], ops, message);
+        })
+        .on('error', error => console.error(error.message));
+    dispatcher.setVolumeLogarithmic(queue.volume / 5);
+    const embed = new MessageEmbed()
+        .setColor("GREEN")
+        .setTitle('Now Playing\n')
+        .setThumbnail(song.thumbnail)
+        .setTimestamp()
+        .setDescription(`🎵 Now playing:\n **${song.title}** 🎵\n\n Song Length: **${np}**`)
+        .setFooter(message.member.displayName, message.author.displayAvatarURL());
+    queue.textChannel.send(embed);
+    return;
 };
