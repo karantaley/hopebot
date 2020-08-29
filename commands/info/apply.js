@@ -14,7 +14,7 @@ module.exports = {
     run: async (bot, message, args) => {
         const role = message.guild.roles.cache.find(r => r.name.toLowerCase() === 'tryouts');
         if (!role) return message.channel.send('**Role Not Found - Tryouts**');
-        
+
         try {
             let applicant = await Applicants.findOne({
                 ApplicantID: message.author.id
@@ -66,7 +66,13 @@ module.exports = {
 
             collector.on('collect', async (collected) => {
                 try {
-                    if (collected.content.toLowerCase() === '+cancel') return message.author.send(`**Application Cancelled**!`);
+                    if (collected.content.toLowerCase() === '+cancel') {
+                        collector.stop('cancelled');
+                        await Applicants.deleteOne({
+                            ApplicantID: message.author.id
+                        });
+                        return;
+                    };
                     if (currentStep === currentStep) currentStep = currentStep + 1;
                     if (currentStep === 1) {
                         const embed = new MessageEmbed()
@@ -118,6 +124,13 @@ module.exports = {
                             .setTimestamp();
                         message.author.send({ embed: embed })
                     };
+                    if (currentStep === 6 && collected.attachments.size <= 0) {
+                        collector.stop('no attachments');
+                        await Applicants.deleteOne({
+                            ApplicantID: message.author.id
+                        });
+                        return;
+                    };
                 } catch (error) {
                     console.error(error);
                     await Applicants.deleteOne({
@@ -127,8 +140,20 @@ module.exports = {
                 };
             });
 
-            collector.on('end', async collected => {
+            collector.on('end', async (collected, reason) => {
                 try {
+                    if (reason.toLowerCase() === 'cancelled') {
+                        message.author.send(`**Application Cancelled!**`);
+                        return await Applicants.deleteOne({
+                            ApplicantID: message.author.id
+                        });
+                    };
+                    if (reason.toLowerCase() === 'no attachments') {
+                        message.author.send(`**Application Rejected! No Profile Attachments Attached!**`);
+                        return await Applicants.deleteOne({
+                            ApplicantID: message.author.id
+                        });
+                    };
                     if (!collected.size) {
                         message.author.send('**Application Cancelled Due To Inactivity!**');
                         return await Applicants.deleteOne({
