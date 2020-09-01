@@ -20,9 +20,7 @@ bot.categories = fs.readdirSync("./commands/");
 bot.on('message', async (message) => {
     try {
         if (message.author.bot || message.channel.type === 'dm') return;
-        if (message.content.toLowerCase() === 'test' && ['393819701924462603', '457556815345877003'].includes(message.author.id)) {
-            bot.emit('guildMemberAdd', message.member);
-        }
+        
         if (message.content.toLowerCase() === 'hello') {
             return message.channel.send(`Hi ${message.member}!`);
         } else if (message.content.toLowerCase() === 'hi') {
