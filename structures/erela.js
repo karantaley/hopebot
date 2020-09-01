@@ -13,7 +13,7 @@ module.exports = {
         ]);
 
         bot.music.on('nodeConnect', () => console.log('Node Connected'));
-        bot.music.on('nodeError', (node, error) => console.log(`Node Error: ${error.message} on node ${node[0]}`));
+        bot.music.on('nodeError', (node, error) => console.log(`Node Error: ${error.message}`));
         bot.music.on("trackStart", (player, track) => {
             const user = bot.users.cache.get(track.requester.id);
             const embed = new MessageEmbed()
