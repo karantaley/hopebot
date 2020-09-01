@@ -11,11 +11,20 @@ module.exports = {
     },
     run: async (bot, message, args, ops) => {
         try {
+            let searchResults;
             const searchString = args.join(' ');
             const { channel } = message.member.voice;
             if (!channel) return message.channel.send('**Please Join A Voice Channel!**');
 
-            const searchResults = await bot.music.search(searchString , message.author);
+            try {
+                searchResults = await bot.music.search(searchString, message.author);
+            } catch {
+                try {
+                    searchResults = await bot.music.search(searchString, message.author);
+                } catch (error) {
+                    return message.channel.send('**❌ No Matches!**');
+                };
+            };
             const tracks = searchResults.tracks.slice(0, 1);
             if (tracks.length === 0) return message.channel.send('**❌ No Matches!**');
 
