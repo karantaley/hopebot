@@ -10,96 +10,91 @@ module.exports = {
         accessableby: "everyone"
     },
     run: async (bot, message, args, ops) => {
-        const serverQueue = ops.queue.get(message.guild.id);
-        if (!serverQueue || serverQueue.connection === null) return message.channel.send('❌ **Nothing playing in this server**');
+        const serverQueue = bot.music.players.get(message.guild.id);
+        if (!serverQueue || serverQueue.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
+
+        const role = message.guild.roles.cache.find(r => r.name.toUpperCase() === 'DJ');
+        if (!role) return message.channel.send('**Role Not Found - DJ**');
+
         try {
             const { channel } = message.member.voice;
-            if (!channel) return message.channel.send('I\'m sorry but you need to be in a voice channel to see the current song playing!');
-            if (message.guild.me.voice.channel !== message.member.voice.channel) {
-                return message.channel.send("**You Have To Be In The Same Channel With The Bot!**");
-            };
-            let video = serverQueue.songs[0];
-            let description;
-            if (video.duration == 'Live Stream') {
-                description = 'Live Stream';
-            } else {
-                description = playbackBar(video);
-            }
-            const videoEmbed = new MessageEmbed()
-                .setThumbnail(video.thumbnail)
-                .setColor('GREEN')
-                .setTitle(video.title)
-                .setDescription(description)
-                .setFooter(message.member.displayName, message.author.displayAvatarURL())
-                .setTimestamp()
-            message.channel.send(videoEmbed);
-            return;
+            if (!channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) return message.channel.send('**You Are Not Connected To Any Voice Channel!**');
 
-            function playbackBar(video) {
-                const passedTimeInMS = serverQueue.connection.dispatcher.streamTime;
-                const passedTimeInMSObj = {
-                    seconds: Math.floor((passedTimeInMS / 1000) % 60),
-                    minutes: Math.floor((passedTimeInMS / (1000 * 60)) % 60),
-                    hours: Math.floor((passedTimeInMS / (1000 * 60 * 60)) % 24)
-                };
-                const passedTimeFormatted = formatDuration(
-                    passedTimeInMSObj
-                );
-
-                const totalDurationObj = video.duration;
-                const totalDurationFormatted = formatDuration(
-                    totalDurationObj
-                );
-
-                let totalDurationInMS = 0;
-                Object.keys(totalDurationObj).forEach(function (key) {
-                    if (key == 'hours') {
-                        totalDurationInMS = totalDurationInMS + totalDurationObj[key] * 3600000;
-                    } else if (key == 'minutes') {
-                        totalDurationInMS = totalDurationInMS + totalDurationObj[key] * 60000;
-                    } else if (key == 'seconds') {
-                        totalDurationInMS = totalDurationInMS + totalDurationObj[key] * 100;
-                    }
-                });
-                const playBackBarLocation = Math.round(
-                    (passedTimeInMS / totalDurationInMS) * 10
-                );
-
-                let playBack = '';
-                for (let i = 1; i < 21; i++) {
-                    if (playBackBarLocation == 0) {
-                        playBack = ':musical_note:▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬';
-                        break;
-                    } else if (playBackBarLocation == 10) {
-                        playBack = '▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬:musical_note:';
-                        break;
-                    } else if (i == playBackBarLocation * 2) {
-                        playBack = playBack + ':musical_note:';
+            if (channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) {
+                if (serverQueue.voiceChannel.id === channel.id) {
+                    let video = serverQueue.queue[0];
+                    let description;
+                    if (video.isStream) {
+                        description = 'Live Stream';
                     } else {
-                        playBack = playBack + '▬';
-                    }
-                }
-                playBack = `${playBack}\n\n\`${passedTimeFormatted} / ${totalDurationFormatted}\``;
-                return playBack
-            }
-
-            function formatDuration(durationObj) {
-                const duration = `${durationObj.hours ? (durationObj.hours + ':') : ''}${
-                    durationObj.minutes ? durationObj.minutes : '00'
-                    }:${
-                    (durationObj.seconds < 10)
-                        ? ('0' + durationObj.seconds)
-                        : (durationObj.seconds
-                            ? durationObj.seconds
-                            : '00')
-                    }`;
-                return duration;
-            }
+                        const part = Math.floor((serverQueue.position / video.duration) * 30);
+                        const positionObj = {
+                            seconds: Math.floor((serverQueue.position / 1000) % 60),
+                            minutes: Math.floor((serverQueue.position / (1000 * 60)) % 60),
+                            hours: Math.floor((serverQueue.position / (1000 * 60 * 60)) % 24)
+                        };
+                        const totalDurationObj = {
+                            seconds: Math.floor((video.duration / 1000) % 60),
+                            minutes: Math.floor((video.duration / (1000 * 60)) % 60),
+                            hours: Math.floor((video.duration / (1000 * 60 * 60)) % 24)
+                        };
+                        description = `${'─'.repeat(part) + '⚪' + '─'.repeat(30 - part)}\n\n\`${formatDuration(positionObj)} / ${formatDuration(totalDurationObj)}\``;
+                    };
+                    const videoEmbed = new MessageEmbed()
+                        .setThumbnail(`https://i.ytimg.com/vi/${video.identifier}/hqdefault.jpg`)
+                        .setColor('GREEN')
+                        .setTitle(video.title)
+                        .setDescription(description)
+                        .setFooter(message.member.displayName, message.author.displayAvatarURL())
+                        .setTimestamp();
+                    return message.channel.send({ embed: videoEmbed });
+                } else {
+                    return message.channel.send('**Please Join The VC In Which The Bot Is Currently Playing Music!**');
+                };
+            } else if (message.member.roles.cache.has(role.id) || message.member.permissions.has('ADMINISTRATOR')) {
+                let video = serverQueue.queue[0];
+                let description;
+                if (video.isStream) {
+                    description = 'Live Stream';
+                } else {
+                    const part = Math.floor((serverQueue.position / video.duration) * 30);
+                    const positionObj = {
+                        seconds: Math.floor((serverQueue.position / 1000) % 60),
+                        minutes: Math.floor((serverQueue.position / (1000 * 60)) % 60),
+                        hours: Math.floor((serverQueue.position / (1000 * 60 * 60)) % 24)
+                    };
+                    const totalDurationObj = {
+                        seconds: Math.floor((video.duration / 1000) % 60),
+                        minutes: Math.floor((video.duration / (1000 * 60)) % 60),
+                        hours: Math.floor((video.duration / (1000 * 60 * 60)) % 24)
+                    };
+                    description = `${'─'.repeat(part) + '⚪' + '─'.repeat(30 - part)}\n\n\`${formatDuration(positionObj)} / ${formatDuration(totalDurationObj)}\``;
+                };
+                const videoEmbed = new MessageEmbed()
+                    .setThumbnail(`https://i.ytimg.com/vi/${video.identifier}/hqdefault.jpg`)
+                    .setColor('GREEN')
+                    .setTitle(video.title)
+                    .setDescription(description)
+                    .setFooter(message.member.displayName, message.author.displayAvatarURL())
+                    .setTimestamp();
+                return message.channel.send({ embed: videoEmbed });
+            };
         } catch (error) {
             console.error(error);
-            serverQueue.connection.dispatcher.end();
-            await message.guild.me.voice.channel.leave();
             return message.channel.send(`An Error Occurred: \`${error.message}\`!`);
-        }
+        };
     }
-}
+};
+
+function formatDuration(durationObj) {
+    const duration = `${durationObj.hours ? (durationObj.hours + ':') : ''}${
+        durationObj.minutes ? durationObj.minutes : '00'
+        }:${
+        (durationObj.seconds < 10)
+            ? ('0' + durationObj.seconds)
+            : (durationObj.seconds
+                ? durationObj.seconds
+                : '00')
+        }`;
+    return duration;
+};
