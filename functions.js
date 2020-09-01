@@ -4,7 +4,7 @@ module.exports = {
         let hours = date.getHours();
         let minutes = date.getMinutes();
         let seconds = date.getSeconds();
-        return pad(hours) + ":" + pad(minutes) + ":" + pad(seconds)
+        return pad(hours) + ":" + pad(minutes) + ":" + pad(seconds);
 
         function pad(num) {
             return ("0" + num).slice(-2);
