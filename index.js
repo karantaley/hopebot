@@ -20,7 +20,7 @@ bot.categories = fs.readdirSync("./commands/");
 bot.on('message', async (message) => {
     try {
         if (message.author.bot || message.channel.type === 'dm') return;
-        
+
         if (message.content.toLowerCase() === 'hello') {
             return message.channel.send(`Hi ${message.member}!`);
         } else if (message.content.toLowerCase() === 'hi') {
