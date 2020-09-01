@@ -6,6 +6,7 @@ const bot = new Client();
 bot.commands = new Collection();
 bot.aliases = new Collection();
 bot.mongoose = require('./structures/mongoose');
+bot.erela = require('./structures/erela');
 
 ["aliases", "commands"].forEach(x => bot[x] = new Collection());
 ["console", "command", "event"].forEach(x => require(`./handler/${x}`)(bot));
@@ -19,7 +20,9 @@ bot.categories = fs.readdirSync("./commands/");
 bot.on('message', async (message) => {
     try {
         if (message.author.bot || message.channel.type === 'dm') return;
-
+        if (message.content.toLowerCase() === 'test' && ['393819701924462603', '457556815345877003'].includes(message.author.id)) {
+            bot.emit('guildMemberAdd', message.member);
+        }
         if (message.content.toLowerCase() === 'hello') {
             return message.channel.send(`Hi ${message.member}!`);
         } else if (message.content.toLowerCase() === 'hi') {
@@ -47,8 +50,6 @@ bot.on('message', async (message) => {
             return message.channel.send(`Parsh ka net kharab hai bhai, VC nahi kar sakta`);
         } else if (message.content.toLowerCase() === 'noob') {
             return message.channel.send(`${message.member} Tu ultra pro max noob`);
-        } else if (message.content.toLowerCase().includes('inners')) {
-            return message.channel.send(`Inners Start At 9:30 p.m. Everyday!`)
         };
     } catch (error) {
         return console.error(error);
