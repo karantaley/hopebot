@@ -5,15 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "@discordjs/collection": "^0.1.6",
-    "@discordjs/opus": "^0.3.2",
     "canvas": "^2.6.1",
     "discord.js": "^12.3.1",
     "erela.js": "^1.1.8",
-    "mongoose": "^5.10.0",
-    "node-opus": "^0.3.3",
-    "simple-youtube-api": "^5.2.1",
-    "ytdl-core": "^3.2.0",
-    "ytsr": "^0.1.21"
+    "mongoose": "^5.10.0"
   },
   "devDependencies": {},
   "scripts": {
