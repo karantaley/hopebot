@@ -9,18 +9,23 @@ module.exports = {
     },
     run: async (bot, message, args, ops) => {
         try {
+            const role = message.guild.roles.cache.find(r => r.name.toUpperCase() === 'DJ');
+            if (!role) return message.channel.send('**Role Not Found - DJ**');
+
+            const player = bot.music.players.get(message.guild.id);
+            if (!player) return message.channel.send('**I Am Not Connected To Any Voice Channel!**');
+
+            if (player.queue.size === 0) return message.channel.send('**Nothing Is Being Played!**');
+
             const { channel } = message.member.voice;
-            if (!channel) return message.channel.send('I\'m sorry but you need to be in a voice channel to pause music!');
-            if (message.guild.me.voice.channel !== message.member.voice.channel) {
-                return message.channel.send("**You Have To Be In The Same Channel With The Bot!**");
+            if (!channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) return message.channel.send('**You Are Not Connected To Any Voice Channel!**');
+
+            if (player.playing) {
+                player.pause(true);
+                return message.channel.send('**Paused** ⏸');
+            } else {
+                return message.channel.send(`**Song Already Paused!**`);
             };
-            const serverQueue = ops.queue.get(message.guild.id);
-            if (serverQueue && serverQueue.playing) {
-                serverQueue.playing = false;
-                serverQueue.connection.dispatcher.pause(true);
-                return message.channel.send('**Paused** :pause_button:');
-            }
-            return message.channel.send('**There is nothing playing!**');
         } catch (error) {
             console.error(error);
             return message.channel.send(`An Error Occurred: \`${error.message}\`!`);
