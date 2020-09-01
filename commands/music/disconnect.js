@@ -1,27 +1,35 @@
 module.exports = {
     config: {
-        name: 'disconnect',
+        name: 'leave',
         aliases: ['dc', 'stop'],
-        category: "music",
-        description: "stops the music playing",
+        description: 'Leave A Voice Channel',
+        category: 'music',
         usage: ' ',
-        acessableby: "everyone"
+        accessableby: 'everyone'
     },
-    run: async (bot, message, args, ops) => {
+    run: async (bot, message, args) => {
         try {
+            const { id } = message.guild;
+
+            const role = message.guild.roles.cache.find(r => r.name.toUpperCase() === 'DJ');
+            if (!role) return message.channel.send('**Role Not Found - DJ**');
+
+            const player = bot.music.players.get(id);
+            if (!player) return message.channel.send('**I Am Not Connected To Any Voice Channel!**');
+
             const { channel } = message.member.voice;
-            if (!channel) return message.channel.send('I\'m sorry but you need to be in a voice channel to stop music!');
-            if (message.guild.me.voice.channel !== message.member.voice.channel) return message.channel.send("**You Have To Be In The Same Channel With The Bot!**");
-            const serverQueue = ops.queue.get(message.guild.id);
-            if (serverQueue) {
-                serverQueue.songs = [];
-                serverQueue.loop = false;
-                serverQueue.connection.dispatcher.end();
-                await message.guild.me.voice.channel.leave();
-            } else {
-                await channel.leave();
-            }
-            return message.channel.send('👋 **Disconnected**');
+            if (!channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) return message.channel.send('**You Are Not Connected To Any Voice Channel!**');
+
+            if (channel) {
+                if (player.voiceChannel.id === channel.id) {
+                    bot.music.players.destroy(id);
+                } else {
+                    return message.channel.send('**Please Join The VC In Which The Bot Has Joined!**');
+                };
+            } else if (message.member.roles.cache.has(role.id) && message.guild.me.voice.channel) {
+                bot.music.players.destroy(id);
+            };
+            return message.channel.send('**Disconnected From VC!**');
         } catch (error) {
             console.error(error);
             return message.channel.send(`An Error Occurred: \`${error.message}\`!`);
