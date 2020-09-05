@@ -1,5 +1,4 @@
 const { PREFIX } = require('../../config');
-const queue = new Map();
 
 module.exports = async (bot, message) => {
     try {
@@ -10,12 +9,8 @@ module.exports = async (bot, message) => {
 
         if (!message.content.startsWith(PREFIX)) return;
 
-        let ops = {
-            queue: queue
-        };
-
         let commandfile = bot.commands.get(cmd) || bot.commands.get(bot.aliases.get(cmd));
-        if (commandfile) commandfile.run(bot, message, args, ops);
+        if (commandfile) commandfile.run(bot, message, args);
 
     } catch (err) {
         console.error(err);
