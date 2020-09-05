@@ -5,6 +5,7 @@ const bot = new Client();
 
 bot.commands = new Collection();
 bot.aliases = new Collection();
+bot.games = new Collection();
 bot.mongoose = require('./structures/mongoose');
 bot.erela = require('./structures/erela');
 
@@ -46,7 +47,7 @@ bot.on('message', async (message) => {
             return message.channel.send('KT\'s reply is on the way.');
         } else if (message.mentions.users.has('412605058086207490') && message.content === '<@!412605058086207490>') {
             return message.channel.send(`Parsh ka net kharab hai bhai, VC nahi kar sakta`);
-        } else if (message.content.toLowerCase() === 'noob') {
+        } else if (message.content.toLowerCase() === 'noob' && message.author.id !== '457556815345877003') {
             return message.channel.send(`${message.member} Tu ultra pro max noob`);
         } else if (message.content.toLowerCase().includes('inners')) {
             return message.channel.send(`Inners Start At 9:30 p.m. Everyday!`)
