@@ -8,7 +8,9 @@
     "canvas": "^2.6.1",
     "discord.js": "^12.3.1",
     "erela.js": "^1.1.8",
-    "mongoose": "^5.10.0"
+    "mongoose": "^5.10.0",
+    "spotify-url-info": "^1.4.0",
+    "ytsr": "^0.1.21"
   },
   "devDependencies": {},
   "scripts": {
