@@ -13,7 +13,7 @@ module.exports = {
         if (!role) return message.channel.send('**Role Not Found - DJ**!');
 
         const player = bot.music.players.get(message.guild.id);
-        if (!player || player.queue.size === 0) return message.channel.send('**I Am Not Connected To Any Voice Channel!**');
+        if (!player || player.queue.size === 0) return message.channel.send('❌ **Nothing Playing In This Server!**');
 
         if (channel && !message.member.roles.cache.has(role.id)) {
             if (channel.id === player.voiceChannel.id) {
