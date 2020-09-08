@@ -1,7 +1,7 @@
 const ytsr = require('ytsr');
 const { MessageEmbed } = require('discord.js');
 
-module.exports = async (bot, message, player, searchQuery, playlist) => {
+module.exports = async (bot, message, player, searchQuery, playlist, TotalLength, currLength) => {
     let tries = 0;
     async function load(search) {
         try {
@@ -25,14 +25,13 @@ module.exports = async (bot, message, player, searchQuery, playlist) => {
                             return message.channel.send({ embed: sembed });
                         };
                     } else {
-                        if (!player.playing && !player.paused) return player.play();
+                        if (!player.playing && !player.paused && TotalLength === currLength) return player.play();
                     };
                 } else if (res.loadType === 'PLAYLIST_LOADED') {
-                    console.log();
                     for (const track of res.playlist.tracks) {
                         player.queue.add(track);
-                        if (!player.playing && !player.paused) player.play();
                     };
+                    if (!player.playing && !player.paused) player.play();
                 };
                 return;
             }
