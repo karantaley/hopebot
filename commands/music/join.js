@@ -7,7 +7,7 @@ module.exports = {
         usage: ' ',
         accessableby: 'everyone'
     },
-    run: async(bot, message, args, ops) => {
+    run: async (bot, message, args, ops) => {
         const { channel } = message.member.voice;
         if (!channel) return message.channel.send('**Please Join A Voice Channel!**');
         const player = bot.music.players.get(message.guild.id);
@@ -16,7 +16,8 @@ module.exports = {
             {
                 guild: message.guild.id,
                 voiceChannel: channel,
-                textChannel: message.channel
+                textChannel: message.channel,
+                selfDeaf: true
             }
         );
         return message.channel.send('**Joined VC!**');
