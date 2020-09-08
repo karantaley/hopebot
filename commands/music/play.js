@@ -15,7 +15,6 @@ module.exports = {
         try {
             const { channel } = message.member.voice;
             if (!channel) return message.channel.send('**Please Join A Voice Channel!**');
-            if (!channel.joinable) return message.channel.send(`**Cannot Join ${channel.name}!**`);
 
             let player = bot.music.players.get(message.guild.id);
             if (!player) {
@@ -28,6 +27,8 @@ module.exports = {
                 );
                 player = bot.music.players.get(message.guild.id);
             };
+
+            if (player.voiceChannel.id !== channel.id) return message.channel.send("**You Have To Be In The Same Channel With The Bot!**");
 
             if (args[0].startsWith('https://open.spotify.com')) {
                 const data = await getData(args.join(''));
