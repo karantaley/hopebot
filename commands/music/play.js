@@ -22,7 +22,8 @@ module.exports = {
                     {
                         guild: message.guild.id,
                         voiceChannel: channel,
-                        textChannel: message.channel
+                        textChannel: message.channel,
+                        selfDeaf: true
                     }
                 );
                 player = bot.music.players.get(message.guild.id);
