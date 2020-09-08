@@ -10,6 +10,7 @@ module.exports = {
     run: async (bot, message, args) => {
         try {
             const player = bot.music.players.get(message.guild.id);
+            if (!player || player.queue.size === 0) return message.channel.send('❌ **Nothing Playing In This Server!**');
 
             if (isNaN(args[0]) || args[0] < 1) return message.channel.send('**Please Enter A Positive Integer!**');
 
