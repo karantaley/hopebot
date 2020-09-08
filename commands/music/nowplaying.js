@@ -10,8 +10,8 @@ module.exports = {
         accessableby: "everyone"
     },
     run: async (bot, message, args, ops) => {
-        const serverQueue = bot.music.players.get(message.guild.id);
-        if (!serverQueue || serverQueue.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
+        const player = bot.music.players.get(message.guild.id);
+        if (!player || player.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
 
         const role = message.guild.roles.cache.find(r => r.name.toUpperCase() === 'DJ');
         if (!role) return message.channel.send('**Role Not Found - DJ**');
@@ -21,17 +21,17 @@ module.exports = {
             if (!channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) return message.channel.send('**You Are Not Connected To Any Voice Channel!**');
 
             if (channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) {
-                if (serverQueue.voiceChannel.id === channel.id) {
-                    let video = serverQueue.queue[0];
+                if (player.voiceChannel.id === channel.id) {
+                    let video = player.queue[0];
                     let description;
                     if (video.isStream) {
                         description = 'Live Stream';
                     } else {
-                        const part = Math.floor((serverQueue.position / video.duration) * 30);
+                        const part = Math.floor((player.position / video.duration) * 30);
                         const positionObj = {
-                            seconds: Math.floor((serverQueue.position / 1000) % 60),
-                            minutes: Math.floor((serverQueue.position / (1000 * 60)) % 60),
-                            hours: Math.floor((serverQueue.position / (1000 * 60 * 60)) % 24)
+                            seconds: Math.floor((player.position / 1000) % 60),
+                            minutes: Math.floor((player.position / (1000 * 60)) % 60),
+                            hours: Math.floor((player.position / (1000 * 60 * 60)) % 24)
                         };
                         const totalDurationObj = {
                             seconds: Math.floor((video.duration / 1000) % 60),
@@ -52,16 +52,16 @@ module.exports = {
                     return message.channel.send('**Please Join The VC In Which The Bot Is Currently Playing Music!**');
                 };
             } else if (message.member.roles.cache.has(role.id) || message.member.permissions.has('ADMINISTRATOR')) {
-                let video = serverQueue.queue[0];
+                let video = player.queue[0];
                 let description;
                 if (video.isStream) {
                     description = 'Live Stream';
                 } else {
-                    const part = Math.floor((serverQueue.position / video.duration) * 30);
+                    const part = Math.floor((player.position / video.duration) * 30);
                     const positionObj = {
-                        seconds: Math.floor((serverQueue.position / 1000) % 60),
-                        minutes: Math.floor((serverQueue.position / (1000 * 60)) % 60),
-                        hours: Math.floor((serverQueue.position / (1000 * 60 * 60)) % 24)
+                        seconds: Math.floor((player.position / 1000) % 60),
+                        minutes: Math.floor((player.position / (1000 * 60)) % 60),
+                        hours: Math.floor((player.position / (1000 * 60 * 60)) % 24)
                     };
                     const totalDurationObj = {
                         seconds: Math.floor((video.duration / 1000) % 60),
