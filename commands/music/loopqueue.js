@@ -15,27 +15,27 @@ module.exports = {
             const { channel } = message.member.voice;
             if (!channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) return message.channel.send('**You Are Not Connected To Any Voice Channel!**');
 
-            const serverQueue = bot.music.players.get(message.guild.id);
-            if (!serverQueue || serverQueue.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
+            const player = bot.music.players.get(message.guild.id);
+            if (!player || player.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
 
             if (channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) {
-                if (serverQueue.voiceChannel.id === channel.id) {
-                    if (!serverQueue.queueRepeat) {
-                        serverQueue.setQueueRepeat(true);
+                if (player.voiceChannel.id === channel.id) {
+                    if (!player.queueRepeat) {
+                        player.setQueueRepeat(true);
                         return message.channel.send('**🔁 Queue Has Been Looped!**');
                     } else {
-                        serverQueue.setQueueRepeat(false);
+                        player.setQueueRepeat(false);
                         return message.channel.send('**🔁 Queue Has Been Unlooped!**');
                     };
                 } else {
                     return message.channel.send('**Please Join The VC In Which The Bot Is Currently Playing Music!**');
                 };
             } else if (message.member.roles.cache.has(role.id) || message.member.permissions.has('ADMINISTRATOR')) {
-                if (!serverQueue.queueRepeat) {
-                    serverQueue.setQueueRepeat(true);
+                if (!player.queueRepeat) {
+                    player.setQueueRepeat(true);
                     return message.channel.send('**🔁 Queue Has Been Looped!**');
                 } else {
-                    serverQueue.setQueueRepeat(false);
+                    player.setQueueRepeat(false);
                     return message.channel.send('**🔁 Queue Has Been Unlooped!**');
                 };
             };
