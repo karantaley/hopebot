@@ -15,7 +15,7 @@ module.exports = {
             if (!role) return message.channel.send('**Role Not Found - DJ**');
 
             const player = bot.music.players.get(id);
-            if (!player) return message.channel.send('**I Am Not Connected To Any Voice Channel!**');
+            if (!player) return message.channel.send('❌ **Nothing Playing In This Server!**');
 
             const { channel } = message.member.voice;
             if (!channel && !message.member.roles.cache.has(role.id) && !message.member.permissions.has('ADMINISTRATOR')) return message.channel.send('**You Are Not Connected To Any Voice Channel!**');
