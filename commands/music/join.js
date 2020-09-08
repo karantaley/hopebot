@@ -11,7 +11,7 @@ module.exports = {
         const { channel } = message.member.voice;
         if (!channel) return message.channel.send('**Please Join A Voice Channel!**');
         const player = bot.music.players.get(message.guild.id);
-        if (player && player.textChannel.id === message.channel.id) return message.channel.send(`**Already Connected To ${channel.name}!**`);
+        if (player) return message.channel.send(`**Already Connected To ${player.voiceChannel.name}!**`);
         bot.music.players.spawn(
             {
                 guild: message.guild.id,
