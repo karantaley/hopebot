@@ -16,11 +16,11 @@ module.exports = {
             if (message.guild.me.voice.channel !== message.member.voice.channel) {
                 return message.channel.send("**You Have To Be In The Same Channel With The Bot!**");
             };
-            const serverQueue = bot.music.players.get(message.guild.id);
-            if (!serverQueue || serverQueue.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
+            const player = bot.music.players.get(message.guild.id);
+            if (!player || player.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
 
             let currentPage = 0;
-            const embeds = generateQueueEmbed(message, serverQueue.queue);
+            const embeds = generateQueueEmbed(message, player.queue);
             const queueEmbed = await message.channel.send(`**Current Page - ${currentPage + 1}/${embeds.length}**`, embeds[currentPage]);
             await queueEmbed.react('⬅️');
             await queueEmbed.react('⏹')
