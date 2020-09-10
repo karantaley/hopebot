@@ -17,7 +17,7 @@ module.exports = {
                 return message.channel.send("**You Have To Be In The Same Channel With The Bot!**");
             };
             const player = bot.music.players.get(message.guild.id);
-            if (!player || player.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
+            if (!player || player.queue.size === 0 || (player.position === 0 && !player.playing)) return message.channel.send('❌ **Nothing Playing In This Server!**');
 
             let currentPage = 0;
             const embeds = generateQueueEmbed(message, player.queue);
