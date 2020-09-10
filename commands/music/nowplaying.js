@@ -11,7 +11,7 @@ module.exports = {
     },
     run: async (bot, message, args, ops) => {
         const player = bot.music.players.get(message.guild.id);
-        if (!player || player.queue.size === 0) return message.channel.send('❌ **Nothing playing in this server**');
+        if (!player || player.queue.size === 0 || (player.position === 0 && !player.playing)) return message.channel.send('❌ **Nothing Playing In This Server!**');
 
         const role = message.guild.roles.cache.find(r => r.name.toUpperCase() === 'DJ');
         if (!role) return message.channel.send('**Role Not Found - DJ**');
