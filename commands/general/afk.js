@@ -20,7 +20,7 @@ module.exports = {
                     name: message.author.username,
                     reason: args.join(' ') || 'afk'
                 });
-                return message.channel.send(`**I Have Set Your AFK\nReason - \`${args.join(' ') || 'afk'}\`!**`);
+                return message.channel.send(`**I Have Set Your AFK\nReason - __${args.join(' ') || 'afk'}__!**`);
             };
         } catch (error) {
             console.error(error);
