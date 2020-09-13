@@ -1,7 +1,6 @@
 const { Client, Collection, MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const { TOKEN } = require('./config');
-const AFKList = require('./structures/models/AFKList');
 const bot = new Client();
 
 bot.commands = new Collection();
@@ -22,24 +21,6 @@ bot.categories = fs.readdirSync("./commands/");
 bot.on('message', async (message) => {
     try {
         if (message.author.bot || message.channel.type === 'dm') return;
-        
-        if (message.content.includes(message.mentions.members.first())) {
-            let mentioned = await AFKList.findOne({
-                ID: message.mentions.members.first().id
-            });
-            if (mentioned) message.channel.send(`**${mentioned.name} Is Currently AFK\nReason - ${mentioned.reason}!**`);
-        };
-
-        let afkcheck = await AFKList.findOne({
-            ID: message.author.id
-        });
-        if (afkcheck) {
-            await AFKList.deleteOne({
-                ID: message.author.id
-            });
-            
-            message.channel.send(`**${message.author}, I Have Removed Your AFK Now!**`)
-        };
 
         if (message.content.toLowerCase() === 'hello') {
             message.channel.send(`Hi ${message.member}!`);
