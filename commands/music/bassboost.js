@@ -20,7 +20,6 @@ module.exports = {
             if (!channel) return message.channel.send(`**❌ You Are Not Connected To Any Voice Channel!**`);
 
             if (!args[0]) {
-                console.log(player.bands[0].gain)
                 if (player.bands[0].gain !== 0) {
                     breaked = true;
                 } else breaked = false;
