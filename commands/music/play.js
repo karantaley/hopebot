@@ -16,6 +16,8 @@ module.exports = {
             const { channel } = message.member.voice;
             if (!channel) return message.channel.send('**Please Join A Voice Channel!**');
             if (!channel.joinable) return message.channel.send(`**Cannot Join This Voice Channel!**`);
+            
+            if (!args[0]) return message.channel.send(`**Please Enter A Song Query Or Link!**`);
 
             let player = bot.music.players.get(message.guild.id);
             if (!player) {
