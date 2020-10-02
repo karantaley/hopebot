@@ -6,7 +6,7 @@ module.exports = {
         name: 'scrim',
         noalias: [''],
         category: 'general',
-        description: 'Adds You To Scrim Team [+r or -r to join or leave]',
+        description: 'Adds You To Scrim Team [+sc or -sc to join or leave]',
         usage: ' ',
         accessableby: 'everyone'
     },
@@ -19,8 +19,10 @@ module.exports = {
 
             const channel = message.guild.channels.cache.get('751660887600922704');
             if (!channel) return message.channel.send(`**Scrim Channel Not Found!**`);
+            const channel2 = message.guild.channels.cache.get('724541103008776232');
+            if (!channel2) return message.channel.send(`**Scrim Channel Not Found!**`);
 
-            if (message.channel.id !== channel.id) return message.channel.send(`**To Find A Scrim, Use <#${channel.id}>**`);
+            if (![channel.id, channel2.id].includes(message.channel.id)) return message.channel.send(`**To Find A Scrim, Use <#${channel.id}> or <#${channel2.id}>**`);
             if (games) {
                 message.channel.send(`**Scrim Searching Is Currently Going On!**`);
                 return bot.games.delete(name);
